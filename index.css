@@ -1,12 +1,13 @@
 .bttns{
+    text-align: center;
     color: white;
     font-size: 50px;
 }
 #btn1{
-    color: white;
+    color: rgb(255, 51, 51);
     display: inline-block;
 }
 #btn2{
-    color: white;
+    color: rgb(53, 208, 255);
     display: inline-block;
 }

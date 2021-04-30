@@ -1,62 +1,69 @@
-var unit, personalizedLatency;
 var textField = document.getElementById("textField");
+var unitField = document.getElementById("units");
+var translation = document.getElementById("tlumaczenie");
+
+var unit;
+
+var start;
+var koniec;
+var pressed = false;
+var dur;
+
+var stringi = "";
+
+var slider = document.getElementById("myRange");
+unitField.innerHTML = "Unit length: " + slider.value;
 
 function testFunc(){
-    fetch('./mcode.json')
+    fetch('./rcode.json')
     .then( res => res.json(),console.log(Error))
     .then(data => {
+        translation.innerHTML= data[stringi];
     });
 }
 
-const timer = document.getElementById('stopwatch');
-var sec = 0;
-var stoptime = true;
-function startTimer() {
-  if (stoptime == true) {
-        stoptime = false;
-        timerCycle();
-    }
-}
-function stopTimer() {
-  if (stoptime == false) {
-    stoptime = true;
-  }
-}
-function resetTimer() {
-    stoptime = true;
-    sec = 0;
-}
-function timerCycle() {
-    if (stoptime == false) {
-    sec = parseInt(sec);
-    sec = sec + 1;
-
-    setTimeout("timerCycle()", 1000);
-  }
-}
-
-unit= sec*personalizedLatency;
-
-var slider = document.getElementById("myRange");
-textField.innerHTML = slider.value;
-slider.oninput = function() {
-  textField.innerHTML = this.value;
-}
-
-
 document.addEventListener("keydown",function(e){
-        startTimer();
-});
-document.addEventListener("keyup",function(e){
     if(e.which == 32){
-        stopTimer();
-        if(sec <= unit){
-            textField.innerHTML += "&#8226 ";
-            sec = 0;
-        }
-        else {
-            textField.innerHTML += "&#9135 ";
-            sec = 0;
+        if(!pressed){
+            start = Date.now();
+            pressed = true;
         }
     }
+});
+
+document.addEventListener("mousedown",function(e){
+    slider.oninput = function() {
+        unitField.innerHTML = "Unit length: " + this.value ;
+    }
+    
+    unit = slider.value * 1000;
+});
+
+document.addEventListener("keyup",function(e){
+
+    if(e.which == 32){
+        pressed = false;
+        koniec = Date.now();
+        dur = (koniec - start);
+        
+        console.log("duration: " +dur);
+        console.log("unit: " + unit);
+
+        if(dur < 3*unit){
+            textField.innerHTML += "&#8226 ";
+            stringi += ".";
+        }
+        else if(dur >= 3*unit && dur <= 7*unit){
+            textField.innerHTML += "&#9135 ";
+            stringi += "-";
+        }
+        dur = 0;
+        console.log(stringi);
+    }
+    if(e.which == 8){
+        var temp = textField.innerHTML.slice(0,textField.innerHTML.length-2);
+        textField.innerHTML= temp;
+        stringi = stringi.slice(0,stringi.length-1);
+    }
+    testFunc();
 });
